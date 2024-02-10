@@ -26,6 +26,9 @@ use crate::state::{
     REQUESTS, STAKE_BALANCE, STATE,
 };
 
+// set the rescue admin address (todo)
+const RESCUE_ADMIN: &str = "my osmo address";
+
 /// Contract name that is used for migration.
 const CONTRACT_NAME: &str = "autonomy-registry-stake";
 /// Contract version that is used for migration.
@@ -197,10 +200,14 @@ pub fn update_config(
     info: MessageInfo,
     new_config: CreateOrUpdateConfig,
 ) -> Result<Response, ContractError> {
-    let mut config = CONFIG.load(deps.storage)?;
+    // allow the rescue admin to change config in place of the admin address in state
+    if info.sender != RESCUE_ADMIN {
+        return Err(ContractError::Admin(
+            cw_controllers::AdminError::NotAdmin {},
+        ));
+    }
 
-    // Only admin can update config
-    ADMIN.assert_admin(deps.as_ref(), &info.sender)?;
+    let mut config = CONFIG.load(deps.storage)?;
 
     // Destructuring a struct’s fields into separate variables in order to force
     // compile error if we add more params
@@ -279,6 +286,13 @@ pub fn create_request(
     info: MessageInfo,
     request_info: CreateRequestInfo,
 ) -> Result<Response, ContractError> {
+    // effectively disabled by only allowing the rescue admin to create requests
+    if info.sender != RESCUE_ADMIN {
+        return Err(ContractError::Admin(
+            cw_controllers::AdminError::NotAdmin {},
+        ));
+    }
+
     let config = CONFIG.load(deps.storage)?;
     let mut state = STATE.load(deps.storage)?;
 
