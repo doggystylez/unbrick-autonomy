@@ -26,8 +26,8 @@ use crate::state::{
     REQUESTS, STAKE_BALANCE, STATE,
 };
 
-// set the rescue admin address (todo)
-const RESCUE_ADMIN: &str = "my osmo address";
+// set the rescue admin address to the OSL DAO DAO on mainnet
+const RESCUE_ADMIN: &str = "osmo1fq3wmetv8xme6v0fn53ujdmtazgz5f04vz3ta9d7qdz8gmrxwpwsy9kelc";
 
 /// Contract name that is used for migration.
 const CONTRACT_NAME: &str = "autonomy-registry-stake";
